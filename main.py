@@ -55,16 +55,23 @@ def create_model():
 
 modelo = create_model()
 
-@app.route("/score/", methods=['POST'])
-def get_score():
+@app.route("/diagnostico/", methods=['POST'])
+def get_diagnostico():
     dados = request.get_json()
     payload = np.array([dados[col] for col in colunas])
 
     df_input = pd.DataFrame(payload).T
     df_input.columns = colunas
 
-    resultado = modelo.predict(df_input) 
-    return str(resultado[0])
+    resultado = modelo.predict(df_input)
+    if(resultado[0]==1) :
+        res = 'Normal'
+    elif(resultado[0]==2) :
+        res = 'Suspeito'
+    else :
+        res = 'Patologico'
+        
+    return str(res)
 
 @app.route("/home")
 def home():
