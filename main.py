@@ -9,10 +9,8 @@ from sklearn.feature_selection import f_classif
 from sklearn.multiclass import OneVsRestClassifier
 from xgboost import XGBClassifier
 from sklearn.metrics import accuracy_score
-
 from flask import Flask, request, jsonify
-
-app = Flask(__name__)
+from flask_basicauth import BasicAuth
 
 colunas = [
     'prolongued_decelerations',
@@ -22,12 +20,20 @@ colunas = [
     'histogram_mean'
 ]
 
+app = Flask(__name__)
+app.config["BASIC_AUTH_USERNAME"] = "admin"
+app.config["BASIC_AUTH_PASSWORD"] = "123"
+
+basic_auth = BasicAuth(app)
+
+
 def load_model(file_name = 'xgboost_modelo.json'):
     return pickle.load(open(file_name, "rb"))
 
 modelo = load_model()
 
 @app.route("/diagnostico/", methods=['POST'])
+@basic_auth.required
 def get_diagnostico():
     dados = request.get_json()
     payload = np.array([dados[col] for col in colunas])
@@ -46,8 +52,10 @@ def get_diagnostico():
     return str(res)
 
 @app.route("/home")
+@basic_auth.required
 def home():
     print("Executou a rota padrão")
     return "API de predição de pontuação de credito"
 
-app.run(debug=True)
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0')
