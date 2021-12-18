@@ -3,6 +3,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 import xgboost as xgb
 import pickle
+import os
 from sklearn.preprocessing import StandardScaler
 from sklearn.feature_selection import SelectKBest
 from sklearn.feature_selection import f_classif
@@ -21,13 +22,13 @@ colunas = [
 ]
 
 app = Flask(__name__)
-app.config["BASIC_AUTH_USERNAME"] = "admin"
-app.config["BASIC_AUTH_PASSWORD"] = "123"
+app.config["BASIC_AUTH_USERNAME"] = os.environ.get('BASIC_AUTH_USERNAME')
+app.config["BASIC_AUTH_PASSWORD"] = os.environ.get('BASIC_AUTH_PASSWORD')
 
 basic_auth = BasicAuth(app)
 
 
-def load_model(file_name = 'xgboost_modelo.json'):
+def load_model(file_name = '../models/xgboost_modelo.json'):
     return pickle.load(open(file_name, "rb"))
 
 modelo = load_model()
